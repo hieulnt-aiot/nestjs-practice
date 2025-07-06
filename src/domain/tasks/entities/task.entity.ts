@@ -17,6 +17,9 @@ export class Task {
   @Column({ nullable: true })
   description?: string;
 
+  @Column({ nullable: true })
+  filePath?: string;
+
   @Column({ default: false })
   isCompleted: boolean;
 

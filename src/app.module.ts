@@ -8,6 +8,8 @@ import { CacheModule } from '@nestjs/cache-manager';
 import { redisStore } from 'cache-manager-ioredis';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -42,6 +44,11 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
         entities: [__dirname + '/**/*.entity.{ts,js}'],
         synchronize: true,
       }),
+    }),
+
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'uploads'),
+      serveRoot: '/uploads',
     }),
   ],
   controllers: [AppController],
