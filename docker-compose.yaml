@@ -1,12 +1,13 @@
-version: '3.9'
 services:
   app:
     build: .
     ports:
-      - '3001:3001'
-    depends_on:
-      - mysql
-      - redis
+      - '3000:3000'
+    volumes:
+      - .:/app
+      - /app/node_modules
+    working_dir: /app
+    command: pnpm start:dev
     environment:
       DATABASE_HOST: mysql
       DATABASE_PORT: 3306
@@ -15,9 +16,11 @@ services:
       DATABASE_NAME: task_management
       REDIS_HOST: redis
       REDIS_PORT: 6379
-    volumes:
-      - .:/app
-    command: pnpm start:dev
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_started
 
   mysql:
     image: mysql:8
@@ -28,6 +31,11 @@ services:
       MYSQL_DATABASE: task_management
     volumes:
       - db_data:/var/lib/mysql
+    healthcheck:
+      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost']
+      interval: 5s
+      timeout: 3s
+      retries: 5
 
   redis:
     image: redis:7
