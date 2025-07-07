@@ -15,6 +15,9 @@ export class User {
   email: string;
 
   @Column()
+  fullName: string;
+
+  @Column()
   password: string;
 
   @CreateDateColumn()

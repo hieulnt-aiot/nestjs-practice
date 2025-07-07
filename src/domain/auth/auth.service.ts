@@ -1,4 +1,4 @@
-import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
+import { HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { RegisterDto } from './dtos/register.dto';
 import { LoginDto } from './dtos/login.dto';
 import { Repository } from 'typeorm';
@@ -7,6 +7,10 @@ import { User } from '../users/entities/user.entity';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { RefreshTokenService } from './tokens/refresh-token.service';
+import { AuthException } from './auth.exception';
+import { AuthErrorCode } from './auth.errors';
+import { plainToInstance } from 'class-transformer';
+import { AuthResponseDto } from './dtos/auth-response.dtos';
 
 @Injectable()
 export class AuthService {
@@ -20,28 +24,75 @@ export class AuthService {
   ) {}
 
   async register(dto: RegisterDto) {
+    const existing = await this.userRepo.findOne({
+      where: { email: dto.email },
+    });
+
+    if (existing)
+      throw new AuthException({
+        message: 'Email already exists',
+        code: AuthErrorCode.EMAIL_EXISTS,
+        status: HttpStatus.CONFLICT,
+      });
+
     const hashed = await bcrypt.hash(dto.password, 10);
-    const user = this.userRepo.create({ email: dto.email, password: hashed });
+    const user = this.userRepo.create({
+      email: dto.email,
+      password: hashed,
+      fullName: dto.fullName,
+    });
     await this.userRepo.save(user);
     this.logger.log(`New user registered: ${user.email}`);
-    return this.generateTokens(user.id);
+
+    const safeUser = plainToInstance(AuthResponseDto, user, {
+      excludeExtraneousValues: true,
+    });
+
+    const { accessToken, refreshToken } = await this.generateTokens(user.id);
+
+    return {
+      success: true,
+      message: 'User registered successfully',
+      user: safeUser,
+      accessToken,
+      refreshToken,
+    };
   }
 
   async login(dto: LoginDto) {
     const user = await this.userRepo.findOne({ where: { email: dto.email } });
     if (!user) {
       this.logger.warn(`Failed login: ${dto.email} not found`);
-      throw new UnauthorizedException('Invalid credentials');
+      throw new AuthException({
+        message: 'Invalid credentials',
+        code: AuthErrorCode.INVALID_CREDENTIALS,
+        status: HttpStatus.UNAUTHORIZED,
+      });
     }
 
     const valid = await bcrypt.compare(dto.password, user.password);
     if (!valid) {
       this.logger.warn(`Failed login: wrong password for ${dto.email}`);
-      throw new UnauthorizedException('Invalid credentials');
+      throw new AuthException({
+        message: 'Invalid credentials',
+        code: AuthErrorCode.INVALID_CREDENTIALS,
+        status: HttpStatus.UNAUTHORIZED,
+      });
     }
 
+    const safeUser = plainToInstance(AuthResponseDto, user, {
+      excludeExtraneousValues: true,
+    });
+
     this.logger.log(`User logged in: ${user.email}`);
-    return this.generateTokens(user.id);
+    const { accessToken, refreshToken } = await this.generateTokens(user.id);
+    return {
+      success: true,
+      message: 'User login successfully',
+      user: safeUser,
+      accessToken,
+      refreshToken,
+    };
   }
 
   async generateTokens(userId: number) {

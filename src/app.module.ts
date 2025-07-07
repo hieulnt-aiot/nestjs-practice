@@ -10,6 +10,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { WinstonModule } from 'nest-winston';
+import { winstonLoggerOptions } from './common/logger/winton.logger';
 
 @Module({
   imports: [
@@ -50,6 +52,8 @@ import { join } from 'path';
       rootPath: join(__dirname, '..', 'uploads'),
       serveRoot: '/uploads',
     }),
+
+    WinstonModule.forRoot(winstonLoggerOptions),
   ],
   controllers: [AppController],
   providers: [AppService],
