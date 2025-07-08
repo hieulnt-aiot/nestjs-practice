@@ -1,6 +1,4 @@
 import { AuthService } from './auth.service';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from '../users/entities/user.entity';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthController } from './auth.controller';
 import { RefreshTokenService } from './tokens/refresh-token.service';
@@ -11,12 +9,7 @@ import { APP_PIPE } from '@nestjs/core';
 import { ValidationPipe } from 'src/common/validation/validation.pipe';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([User]),
-    UsersModule,
-    JwtModule.register({}),
-    CacheModule.register(),
-  ],
+  imports: [UsersModule, JwtModule.register({}), CacheModule.register()],
   providers: [
     AuthService,
     RefreshTokenService,

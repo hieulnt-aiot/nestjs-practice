@@ -10,7 +10,7 @@ export class AuthResponseDto {
   @Expose()
   email: string;
 
-  @ApiProperty({ example: 'Nguyen Van A' })
+  @ApiProperty({ example: 'John Smith' })
   @Expose()
   fullName: string;
 }

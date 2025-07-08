@@ -2,17 +2,23 @@ import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateTaskDto {
-  @ApiProperty({ description: 'Tên task' })
+  @ApiProperty({ example: 'Task no.1', description: `Task's name` })
   @IsNotEmpty()
   @IsString()
   title: string;
 
-  @ApiPropertyOptional({ description: 'mô tả cho task' })
+  @ApiPropertyOptional({
+    example: 'This is decription',
+    description: `Task's decription`,
+  })
   @IsOptional()
   @IsString()
   description?: string;
 
-  @ApiPropertyOptional({ description: 'Trạng thái cho task' })
+  @ApiPropertyOptional({
+    example: 'PENDING',
+    description: `Task's status, is optional`,
+  })
   @IsOptional()
   @IsString()
   status?: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED';

@@ -6,10 +6,16 @@ import { JwtPayload } from './jwt-payload.interface';
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor() {
+    const secret = process.env.JWT_SECRET;
+
+    if (!secret) {
+      throw new Error('JWT_SECRET is not defined in enviroment variables');
+    }
+
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: process.env.JWT_SECRET || 'your_jwt_secret',
+      secretOrKey: secret,
     });
   }
 
@@ -26,10 +32,18 @@ export class JwtRefreshStrategy extends PassportStrategy(
   'jwt-refresh'
 ) {
   constructor() {
+    const secret = process.env.JWT_REFRESH_SECRET;
+
+    if (!secret) {
+      throw new Error(
+        'JWT_REFRESH_SECRET is not defined in enviroment variables'
+      );
+    }
+
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       passReqToCallback: true,
-      secretOrKey: process.env.JWT_REFRESH_SECRET || 'your_jwt_refresh_secret',
+      secretOrKey: secret,
     });
   }
 

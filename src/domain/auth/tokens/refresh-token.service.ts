@@ -13,7 +13,7 @@ export class RefreshTokenService {
       `refresh:${token}`,
       userId,
       7 * 24 * 3600 * 1000
-    ); // 7 days
+    );
     return token;
   }
 

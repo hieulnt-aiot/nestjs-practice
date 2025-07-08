@@ -21,7 +21,7 @@
     "lint:fix": "eslint src/**/*.{js,ts} --fix",
     "format:check": "prettier --check src/**/*.{js,ts,jsx,tsx,json,css,md}",
     "commit": "cz",
-    "migration:generate": "ts-node ./node_modules/typeorm/cli.js migration:generate src/database/migrations/CreateTasksTable -d src/database/typeorm.config.ts",
+    "migration:generate": "ts-node ./node_modules/typeorm/cli.js migration:generate src/database/migrations/$npm_config_name -d src/database/typeorm.config.ts",
     "migration:run": "ts-node ./node_modules/typeorm/cli.js migration:run -d src/database/typeorm.config.ts"
   },
   "config": {

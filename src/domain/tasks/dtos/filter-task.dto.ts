@@ -3,23 +3,29 @@ import { Type } from 'class-transformer';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class FilterTaskDto {
-  @ApiPropertyOptional({ description: 'key search' })
+  @ApiPropertyOptional({ description: 'Key search' })
   @IsOptional()
   @IsString()
   search?: string;
 
-  @ApiPropertyOptional({ description: 'Trạng thái' })
+  @ApiPropertyOptional({
+    example: 'PENDING',
+    description: `Filter by status ('PENDING' | 'IN_PROGRESS' | 'COMPLETED')`,
+  })
   @IsOptional()
   @Type(() => Boolean)
   isCompleted?: boolean;
 
-  @ApiPropertyOptional({ description: 'Số trang' })
+  @ApiPropertyOptional({ example: '1', description: 'Current page' })
   @Type(() => Number)
   @Min(1)
   @IsOptional()
   page?: number;
 
-  @ApiPropertyOptional({ description: 'Số lượng record cho 1 trang' })
+  @ApiPropertyOptional({
+    example: '10',
+    description: 'Number of records for one page',
+  })
   @Type(() => Number)
   @Min(1)
   @Max(100)

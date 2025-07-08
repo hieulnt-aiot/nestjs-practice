@@ -9,7 +9,7 @@ export class RegisterDto {
   @IsEmail()
   email: string;
 
-  @ApiProperty({ example: 'Nguyen Van A' })
+  @ApiProperty({ example: 'Join Smith' })
   @IsNotEmpty()
   fullName: string;
 
